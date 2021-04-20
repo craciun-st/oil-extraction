@@ -1,0 +1,62 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Business {
+    - day : int
+    - extractors : List<Extractor>
+    - employees : List<Worker>
+    + getExtractorsWithFaults() : List<Extractor>
+    + getRecentProductiveExtractors() : List<Extractor>
+
+    + update() : void
+    + moveWorkerToSite(Worker, Extractor) : void
+    + addExtractor( Extractor ) : void
+    + getMaxSerialForExtractor() : int
+}
+
+abstract class Extractor {
+    - id : int
+    - capacity : double
+    - lastDayOutput : double
+    + {abstract} hasFault() : boolean
+    + hasBeenProductiveInLastDay() : boolean
+
+    + setLastDayOutputAsFractionOfCapacity(double) : void
+}
+
+class FixedLandExtractor extends Extractor {
+    + location : String {readOnly}
+    + hasFault() : boolean = false
+}
+
+class MobileLandExtractor extends Extractor {
+    + location : String
+}
+
+class OffshorePlatform extends Extractor {
+    - workers : List<Worker>
+    + addWorker( Worker ) : boolean
+    + removeWorker( Worker ) : boolean
+}
+
+class Worker {
+    - position : Position
+    - nrOfDaysOnSite : int
+    - name : String
+    - site : Extractor
+    + leaveSite() : boolean
+}
+
+enum Position {
+    MANUAL_WORKER,
+    MEDIC,
+    MANAGER
+}
+
+
+
+    Business::extractors o-- Extractor
+    OffshorePlatform::workers o-- Worker
+    Business::employees o-- Worker
+    Worker::position --> Position
+@enduml
